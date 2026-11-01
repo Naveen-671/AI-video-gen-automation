@@ -1,0 +1,81 @@
+{
+  "title": "What REALLY Happens When You Get a Tattoo",
+  "slug": "TattooInk",
+  "project_dir": "/home/naveenr/flow-mcp-out/TattooInk",
+  "total_duration": 56.0,
+  "watermark_badge": "/home/naveenr/flow-mcp-out/TattooInk/watermark_badge.png",
+  "voice": "am_adam",
+  "voice_speed": 1.22,
+  "scenes": [
+    {
+      "index": 0,
+      "id": "scene-01",
+      "name": "The Syringe Myth",
+      "target_start": 0.4,
+      "narration": "You might think a tattoo needle injects ink into your skin like a syringe. But that's not how it works at all.",
+      "sfx": "needle_buzz",
+      "danger_words": ["NEEDLE", "NOT"],
+      "safe_words": []
+    },
+    {
+      "index": 1,
+      "id": "scene-02",
+      "name": "Rapid Micro-Punctures",
+      "target_start": 8.4,
+      "narration": "Instead, the needle punctures your skin up to three thousand times a minute, tearing open the dermis and leaving pools of ink.",
+      "sfx": "rapid_impact",
+      "danger_words": ["PUNCTURES", "TEARING", "POOLS"],
+      "safe_words": []
+    },
+    {
+      "index": 2,
+      "id": "scene-03",
+      "name": "Immune System Invasion",
+      "target_start": 16.4,
+      "narration": "Your immune system immediately treats this as a massive attack, sending an army of white blood cells called macrophages to destroy the invader.",
+      "sfx": "alarm_whoosh",
+      "danger_words": ["ATTACK", "DESTROY", "INVADER"],
+      "safe_words": ["IMMUNE"]
+    },
+    {
+      "index": 3,
+      "id": "scene-04",
+      "name": "Phagocytosis Attempt",
+      "target_start": 24.4,
+      "narration": "These cells literally swallow the ink particles to dissolve them. But the pigment particles are far too large for their enzymes to digest.",
+      "sfx": "cell_squish",
+      "danger_words": ["SWALLOW", "FAIL", "DIGEST"],
+      "safe_words": []
+    },
+    {
+      "index": 4,
+      "id": "scene-05",
+      "name": "The Cellular Tomb",
+      "target_start": 32.4,
+      "narration": "Unable to break the ink down, the macrophages become trapped, bloated with pigment, and eventually die locked inside your skin tissue.",
+      "sfx": "trap_thud",
+      "danger_words": ["TRAPPED", "BLOATED", "DIE", "LOCKED"],
+      "safe_words": []
+    },
+    {
+      "index": 5,
+      "id": "scene-06",
+      "name": "The Eternal Biological Cycle",
+      "target_start": 40.4,
+      "narration": "When they die, new macrophages immediately swarm in to re-swallow the escaping ink, keeping the tattoo trapped in an endless biological loop.",
+      "sfx": "cycle_drone",
+      "danger_words": ["DIE", "TRAPPED", "ENDLESS"],
+      "safe_words": []
+    },
+    {
+      "index": 6,
+      "id": "scene-07",
+      "name": "Laser Shatter Resolution",
+      "target_start": 48.4,
+      "narration": "The only way to remove it is laser treatment, which shatters the ink into microscopic dust that your cells can finally flush away.",
+      "sfx": "laser_shatter",
+      "danger_words": ["SHATTERS"],
+      "safe_words": ["REMOVE", "FLUSH", "FINALLY"]
+    }
+  ]
+}

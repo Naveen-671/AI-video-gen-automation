@@ -1,0 +1,76 @@
+{
+  "genre_id": "02_engineering_disasters",
+  "genre_name": "Engineering Disasters & Mechanical Curiosities",
+  "channel_brand": "TECH CRASH 3D",
+  "tagline": "How Engineering Marvels Fail in Fractions of a Second",
+  "branding_badge": {
+    "icon": "Glowing amber mechanical gear with safety caliper",
+    "theme": "Dark slate industrial carbon (#0F141C)",
+    "accent_color": "#FF8C00",
+    "overlay_position": "860:1680"
+  },
+  "visual_style": {
+    "aesthetic": "3D CAD exploded views, glowing finite element analysis (FEA) stress heatmaps (cyan to crimson), micro-crack propagation, metallic structural shearing, octane studio render, 9:16 vertical",
+    "camera_rules": "Micro-zoom into microscopic metal fatigue, fast tracking alongside high-speed mechanics, slow-motion explosive structural failure"
+  },
+  "audio_profile": {
+    "voice_model": "Kokoro-ONNX",
+    "voice_speaker": "am_adam",
+    "voice_speed": 1.22,
+    "tone": "Urgent, forensic, authoritative technical investigation",
+    "ambient_bed": "Deep 48 Hz industrial low-end drone with subtle hydraulic hum",
+    "foley_cues": ["hydraulic_hiss", "metal_groan", "fracture_snap", "deep_implosion_thud", "decompression_blast", "warning_klaxon"]
+  },
+  "subtitle_profile": {
+    "font": "Liberation Sans Bold",
+    "font_size": 74,
+    "margin_v": 420,
+    "stroke_width": 5.5,
+    "active_word_color": "&H00D7FF&",
+    "danger_word_color": "&H1010FF&",
+    "safe_word_color": "&H00D0FF&"
+  },
+  "lead_video_concept": {
+    "title": "Why Submarines Implode In Less Than 1 Millisecond",
+    "hook": "When a deep-sea submersible hull micro-fractures at 12,000 feet, the passengers don't even have time to blink. The entire vessel implodes before pain signals can reach the human brain.",
+    "duration": 56.0,
+    "scenes_count": 7,
+    "scenes": [
+      {
+        "id": "scene-01",
+        "name": "The Deep Ocean Abyss",
+        "beat": "Submersible at 12,000 feet surrounded by crushing black water; 400 atmospheres of pressure pressing against every square inch of the hull."
+      },
+      {
+        "id": "scene-02",
+        "name": "Micro-Defect in Carbon Fiber",
+        "beat": "Extreme macro cross-section: delamination between carbon fiber sheets; microscopic water seep causing instantaneous delamination."
+      },
+      {
+        "id": "scene-03",
+        "name": "The Millisecond Buckle",
+        "beat": "FEA heat-map visual: stress lines violently turning crimson; the hull walls buckling inward at over 1,500 miles per hour."
+      },
+      {
+        "id": "scene-04",
+        "name": "Adiabatic Air Compression",
+        "beat": "Interior cabin: trapped air compressed adiabatically into a tiny pocket, heating up to the temperature of the surface of the sun."
+      },
+      {
+        "id": "scene-05",
+        "name": "Human Neural Latency",
+        "beat": "3D nervous system cross-section: human pain receptors require 100 milliseconds to transmit a signal to the brain; the implosion finishes in under 1 millisecond."
+      },
+      {
+        "id": "scene-06",
+        "name": "Instantaneous Vaporization",
+        "beat": "Water jet blast tearing through the structural shell, reducing the cabin to particulate debris before any physical sensation."
+      },
+      {
+        "id": "scene-07",
+        "name": "Engineering Lesson",
+        "beat": "Titanium vs composite spherical hulls; why modern deep-sea research subs strictly use solid forged titanium spheres."
+      }
+    ]
+  }
+}

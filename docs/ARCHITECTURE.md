@@ -1,8 +1,8 @@
 # Architecture Specification: AI Shorts & Reels Factory
 
-**Version:** 1.0.0-draft  
-**Status:** Under Review (Read-Only Phase)  
-**Target Hardware:** Fedora 44, AMD Ryzen 5 8645HS, NVIDIA RTX 3050 (6 GB VRAM), 14 GiB RAM, 45 GB Disk  
+**Version:** 1.1.0 (Phase 2A Baseline)  
+**Status:** Implemented & Verified  
+**Target Hardware:** Fedora 44, AMD Ryzen 5 8645HS, NVIDIA RTX 3050 (6 GB VRAM), 14 GiB RAM, 44 GB Free Disk  
 **Host Binding:** `127.0.0.1` (Single-user local instance)
 
 ---
@@ -13,6 +13,7 @@ The **AI Shorts & Reels Factory** is a deterministic, self-hosted video producti
 
 ```
 ┌──────────────── Browser: Next.js UI (Static Export, 127.0.0.1 only) ───────────────┐
+│ • Project Manager · Storyboard Editor · Asset Ingest · MP4 Preview · Approval Gate │
 └────────────────────────────────────────▲────────────────────────────────────────────┘
                                          │ REST + SSE (Approvals require human session)
 ┌─────────────────────────────── FastAPI (API Process) ───────────────────────────────┐
@@ -23,8 +24,8 @@ The **AI Shorts & Reels Factory** is a deterministic, self-hosted video producti
                                          │ Atomic Job Lease / Heartbeat / Complete
 ┌──────────────────────── Worker Daemon (1 Process, 1 GPU slot) ──────────────────────┐
 │ • Pipeline Runner: Stage dispatchers (Script → Storyboard → Assets → Render → QA)   │
-│ • Video Engine: Declarative FFmpeg composition (stills + Ken Burns motion + audio)  │
-│ • Rule-based QA: ffprobe technical verification, silence/black-frame detection      │
+│ • Video Engine: Declarative FFmpeg composition (stills + ASS subtitles + AAC audio) │
+│ • Rule-based QA: ffprobe technical verification, 9:16 resolution, duration, audio   │
 │ • Provider Adapters: LLM proposals, Image gen, TTS, manual-ingest, Publisher outbox│
 └────────────────────────────────────────┬────────────────────────────────────────────┘
                                          │ Content-addressed storage (SHA-256)
@@ -36,7 +37,7 @@ The **AI Shorts & Reels Factory** is a deterministic, self-hosted video producti
 1. **Zero Added Recurring Cost:** No provider categorized as `metered` is permitted to execute by default. Billing-enabled API keys are banned. All external quota consumption must go through ledger reservation.
 2. **Immutable Approval Binding:** A video cannot be scheduled or published unless an active, non-superseded `approval` record exists matching the **exact SHA-256 checksum** of the final render output.
 3. **Deterministic Enforcement vs. Probabilistic Proposals:** LLMs produce structured, schema-validated proposals only. The deterministic policy engine owns all workflow state transitions, quota reservations, and publishing decisions.
-4. **Single-Worker Concurrency Control:** Only one background worker process runs, enforcing a strict limit of **one GPU-bound task at a time**.
+4. **Single-Worker Concurrency Control:** Only one background worker process runs, enforcing a strict limit of **one GPU/CPU-bound render task at a time**.
 5. **Fail-Closed Publishing & Outbox Pattern:** Direct database triggers block unauthorized publishing. Publishing attempts use an idempotent outbox pattern; uncertain network timeouts trigger reconciliation, never blind re-upload.
 6. **Resource-Aware Guardrails:** The worker pauses job processing if available host RAM is `< 3.0 GiB` or free disk space is `< 10.0 GB`.
 
@@ -48,8 +49,7 @@ To preserve RAM on the 14 GiB host system, the runtime topology is condensed int
 
 ### Process 1: FastAPI API Server (`backend/app/api`)
 - Runs with Uvicorn bound strictly to `127.0.0.1:8000`.
-- Provides REST endpoints for idea management, review UI, manual asset uploads, and system administration.
-- Provides Server-Sent Events (SSE) for real-time progress and job status updates.
+- Provides REST endpoints for project management, storyboard editing, asset uploads, review UI, and system administration.
 - Serves the static export of the Next.js frontend (`frontend/out`) directly via FastAPI's `StaticFiles`.
 - Enforces human session tokens for all approval and publishing mutation routes.
 
@@ -58,15 +58,10 @@ To preserve RAM on the 14 GiB host system, the runtime topology is condensed int
 - Continuously polls the SQLite-backed job queue using `BEGIN IMMEDIATE` transactions to prevent duplicate leases.
 - Maintains a heartbeat per leased job; automatically re-queues expired leases.
 - Executes stage handlers:
-  - `SCRIPT_GENERATE`: Generates structured master script proposal.
-  - `SCRIPT_LOCALIZE`: Creates language/locale-specific script variants.
-  - `STORYBOARD`: Breaks script into visual/audio scenes with Ken Burns camera instructions.
-  - `STILLS_GENERATE`: Generates high-res visual stills per scene.
-  - `AUDIO_SYNTHESIS`: Renders narration via Kokoro ONNX (or ingests manual audio).
-  - `CAPTION_ALIGN`: Generates word-level timestamps and SSA/ASS styled subtitles.
-  - `FFMPEG_COMPOSE`: Compiles scenes, motion, audio ducking, and subtitles into immutable MP4.
-  - `TECHNICAL_QA`: Evaluates rule-based technical checks (resolution, duration, clipping, black frames).
-  - `PUBLISH_OUTBOX`: Executes platform upload if approved.
+  - `RENDER_PROJECT`: Generates default scene backgrounds if missing, formats ASS subtitles, invokes FFmpeg composition subprocess, validates via `TechnicalQA`, creates immutable render row, and marks project `AWAITING_APPROVAL`.
+  - `MOCK_SCRIPT`: Generates structured master script proposal.
+  - `MOCK_AUDIO`: Generates mock narration audio.
+  - `MOCK_STILLS`: Generates synthetic still images.
 
 ---
 
@@ -83,40 +78,26 @@ To preserve RAM on the 14 GiB host system, the runtime topology is condensed int
 
 ```mermaid
 erDiagram
-    CHANNELS ||--o{ PROFILES : configures
-    CHANNELS ||--o{ IDEAS : contains
-    IDEAS ||--o{ MASTER_SCRIPTS : generates
-    MASTER_SCRIPTS ||--o{ LOCALIZED_VARIANTS : translates
-    LOCALIZED_VARIANTS ||--o{ STORYBOARDS : designs
-    STORYBOARDS ||--o{ SCENES : breaks_into
-    SCENES ||--o{ ASSETS : references
-    LOCALIZED_VARIANTS ||--o{ RENDERS : compiles
+    PROJECTS ||--o{ PROJECT_SCENES : contains
+    PROJECTS ||--o{ RENDERS : compiles
     RENDERS ||--o{ APPROVALS : receives
     APPROVALS ||--o{ PUBLISH_ATTEMPTS : authorizes
     JOBS ||--o{ JOB_ATTEMPTS : tracks
-    PROVIDERS ||--o{ QUOTA_LEDGER : tracks_usage
 ```
 
-1. **`channels`**: Channel identifier, platform (YouTube, Instagram), active status, credentials reference in OS keyring.
-2. **`profiles`**: Niche, audience style, visual themes, default duration, voice preferences, aspect ratio (default `9:16`).
-3. **`ideas`**: Topic, premise, target audience, format template, status, lifecycle state.
-4. **`master_scripts`**: Source narrative, hook, body scenes, call to action, language (default US English), version.
-5. **`localized_variants`**: Target language (English, Hindi, Kannada, etc.), translated narration text, locale nuances, version.
-6. **`storyboards`**: Scene sequence, visual prompts, transition styles, subtitle styling parameters, version.
-7. **`scenes`**: Scene index, prompt, visual asset reference, duration, camera movement recipe (Ken Burns zoom/pan).
-8. **`assets`**: Content-addressed media registry (`sha256`, byte size, mime type, provenance, source URL/path, license metadata).
-9. **`renders`**: Immutable video artifact (`id`, `localized_variant_id`, `render_checksum`, `recipe_json`, `duration_seconds`, `resolution`, `file_path`, `qa_status`, `created_at`).
-10. **`approvals`**: Human decision record (`id`, `render_id`, `render_checksum`, `reviewer`, `status`, `notes`, `created_at`, `superseded_at`).
-11. **`publish_attempts`**: Publisher outbox records (`id`, `approval_id`, `render_id`, `platform`, `target_channel_id`, `status`, `external_id`, `retry_count`, `idempotency_key`, `created_at`).
-12. **`jobs`**: Worker queue (`id`, `stage`, `payload_json`, `idempotency_key`, `status`, `lease_token`, `lease_expires_at`, `attempts`, `max_attempts`, `priority`).
-13. **`quota_ledger`**: Provider resource tracking (`provider_id`, `cost_class`, `reserved_units`, `committed_units`, `period_start`, `period_end`).
-14. **`audit_log`**: Tamper-evident ledger of all policy state transitions and human approvals.
-15. **`settings`**: Key-value system configurations, including `global_pause` boolean and media retention limits.
+1. **`projects`**: Unique project record (`id`, `title`, `topic`, `target_audience`, `language`, `target_duration`, `content_format`, `narration_mode`, `narration_audio_path`, `status`, `current_render_id`, `created_at`, `updated_at`).
+2. **`project_scenes`**: Granular scene data (`id`, `project_id`, `scene_index`, `scene_title`, `narration_text`, `caption_text`, `duration_seconds`, `visual_asset_path`, `created_at`).
+3. **`renders`**: Immutable video artifact (`id`, `project_id`, `localized_variant_id`, `render_checksum`, `recipe_json`, `duration_seconds`, `resolution`, `file_path`, `qa_status`, `created_at`).
+4. **`approvals`**: Human decision record (`id`, `render_id`, `render_checksum`, `reviewer`, `status`, `notes`, `created_at`, `superseded_at`).
+5. **`publish_attempts`**: Publisher outbox records (`id`, `approval_id`, `render_id`, `platform`, `target_channel_id`, `status`, `external_id`, `retry_count`, `idempotency_key`, `created_at`).
+6. **`jobs`**: Worker queue (`id`, `stage`, `payload_json`, `idempotency_key`, `status`, `lease_token`, `lease_expires_at`, `attempts`, `max_attempts`, `priority`).
+7. **`audit_log`**: Tamper-evident ledger of all policy state transitions and human approvals.
+8. **`settings`**: Key-value system configurations, including `global_pause` boolean and media retention limits.
 
 ### Hard Database Invariant: Trigger on `publish_attempts`
 To ensure that no code or agent can bypass human approval:
 ```sql
-CREATE TRIGGER enforce_valid_approval_before_publish
+CREATE TRIGGER IF NOT EXISTS enforce_valid_approval_before_publish
 BEFORE INSERT ON publish_attempts
 FOR EACH ROW
 BEGIN
@@ -137,162 +118,241 @@ END;
 
 ---
 
-## 4. State Machines
+## 4. Video Composition & QA Pipeline
 
-### 4.1 Video Lifecycle State Machine
-
-```mermaid
-stateDiagram-v2
-    [*] --> IDEA
-    IDEA --> SCRIPTING
-    SCRIPTING --> STORYBOARD
-    STORYBOARD --> GENERATING
-    GENERATING --> EDITING
-    EDITING --> QA
-    QA --> AWAITING_APPROVAL : QA Rules Passed
-    QA --> FAILED_QA : Rule Violation
-    FAILED_QA --> EDITING : Fix Parameters
-    AWAITING_APPROVAL --> APPROVED : Human Sign-off
-    AWAITING_APPROVAL --> REJECTED : Human Rejection
-    REJECTED --> SCRIPTING : Rewrite
-    REJECTED --> STORYBOARD : Redesign
-    REJECTED --> EDITING : Re-render
-    APPROVED --> SCHEDULED : Queue for Publish
-    APPROVED --> AWAITING_APPROVAL : Input edited (Approval Superseded)
-    SCHEDULED --> PUBLISHING : Time Elapsed
-    PUBLISHING --> PUBLISHED : Success
-    PUBLISHING --> PUBLISH_UNCERTAIN : Timeout / 5xx
-    PUBLISH_UNCERTAIN --> RECONCILING : Verify External State
-    RECONCILING --> PUBLISHED : Confirmed Found
-    RECONCILING --> APPROVED : Confirmed Missing (Ready for Retry)
-    PUBLISHED --> [*]
+```
+  Storyboard Scenes (durations + titles + captions)
+          │
+          ├────────────────────────┐
+          ▼                        ▼
+  Visual Assets (PNG/JPG)   Subtitles Generator (.ass)
+          │                        │
+          └───────────┬────────────┘
+                      ▼
+            FFmpeg CLI via Subprocess
+                      │
+                      ▼
+         Web-Optimized MP4 (H.264 / AAC)
+                      │
+                      ▼
+            ffprobe Technical QA
+          (Width, Height, Duration, Codec)
+                      │
+                      ▼
+       SHA-256 Checksum Calculation & Store
 ```
 
-#### Material Edit & Invalidation Rule
-If any input (script text, scene visual prompt, audio voice, subtitle styling, or transition duration) is modified after a render has been approved:
-1. A new `render_v` row is created with a newly computed recipe hash and checksum.
-2. The previous approval row is updated: `superseded_at = CURRENT_TIMESTAMP`.
-3. The video state immediately drops back from `APPROVED` or `SCHEDULED` to `AWAITING_APPROVAL`.
+### Narration & Audio Subsystem
 
-### 4.2 Job Queue State Machine
-
-```mermaid
-stateDiagram-v2
-    [*] --> QUEUED
-    QUEUED --> LEASED : Worker begins IMMEDIATE txn
-    LEASED --> RUNNING : Heartbeat initialized
-    RUNNING --> SUCCEEDED : Stage completed
-    RUNNING --> FAILED_RETRYABLE : Transient error (Attempts < Max)
-    FAILED_RETRYABLE --> QUEUED : Exponential backoff
-    RUNNING --> FAILED_PERMANENT : Deterministic error / Schema violation
-    RUNNING --> NEEDS_HUMAN : Quota exhausted / Resource breach
-    RUNNING --> CANCELLED : Global pause / User abort
-    LEASED --> QUEUED : Lease expired (Worker crashed)
-    SUCCEEDED --> [*]
+```
+                      BaseNarrationAdapter (backend/app/media/narration.py)
+                                      │
+         ┌────────────────────────────┼────────────────────────────┐
+         ▼                            ▼                            ▼
+SilentNarrationAdapter       ManualAudioAdapter           LocalTTSAdapter (Phase 2B)
+(Synthetic stereo AAC)      (ffprobe verification)       (Kokoro-82M ONNX on CPU)
+                                                         • English (af_bella, etc.)
+                                                         • Hindi (hf_alpha, etc.)
+                                                         • Speed: 0.5x – 2.0x
 ```
 
-### 4.3 Publish Attempt State Machine
-- `PENDING`: Outbox row created by policy engine following explicit human approval.
-- `IN_FLIGHT`: Publisher adapter initiates upload with platform-specific idempotency key.
-- `SUCCESS`: Platform returns verified video ID and URL.
-- `FAILED_RETRYABLE`: Network connection dropped prior to payload transmission.
-- `UNCERTAIN`: Platform dropped connection during or immediately after chunked upload.
-- `RECONCILING`: Worker queries platform API for recently uploaded media matching video title/checksum to confirm or refute upload without re-sending media bytes.
+- **`SilentNarrationAdapter`**: Generates a synchronized silent stereo AAC audio track matching exact scene durations.
+- **`ManualAudioAdapter`**: Verifies user-uploaded voiceovers (WAV/MP3) via `ffprobe` for duration, channel count, and integrity. Guarantees full support for regional Indian languages (Kannada, Tamil, Telugu) without AI dependencies.
+- **`LocalTTSAdapter` (Phase 2B)**: Executes Kokoro-82M ONNX inference purely on CPU. Generates 24 kHz mono audio, converted by FFmpeg into AAC stereo. Incorporates audio SHA-256 checksum into render recipe. Fail-closed on missing models; zero paid cloud fallbacks.
+
+### Composition Engine
+- Direct argument-list invocation of `/usr/bin/ffmpeg` via Python standard library `subprocess`.
+- Default canvas: 720×1280 (9:16 vertical), configurable to 1080×1920.
+- Video codec: `libx264` (CPU software encoding, fast preset, crf 23, faststart enabled).
+- Audio codec: `aac` 128k stereo.
+- Subtitle burn-in: SubStation Alpha (ASS) filter with bottom margin safety zone (margin_v ≥ 150px) preventing UI collision on YouTube Shorts and Instagram Reels.
 
 ---
 
-## 5. Composition & Rendering Engine (FFmpeg Baseline)
+## 5. Research Agent, FactLedger & Script Intelligence Subsystem (Stage 2)
 
-### Render Recipe Model
-The entire rendering pipeline is governed by a deterministic JSON recipe:
-```json
-{
-  "version": 1,
-  "output": {
-    "format": "mp4",
-    "width": 1080,
-    "height": 1920,
-    "fps": 30,
-    "video_codec": "libx264",
-    "audio_codec": "aac",
-    "pixel_format": "yuv420p"
-  },
-  "audio": {
-    "narration_asset_sha256": "...",
-    "background_music_asset_sha256": "...",
-    "ducking_db": -18.0
-  },
-  "subtitles": {
-    "ass_asset_sha256": "...",
-    "font_family": "Montserrat",
-    "font_size": 18
-  },
-  "scenes": [
-    {
-      "index": 0,
-      "still_asset_sha256": "...",
-      "duration": 4.5,
-      "motion": {
-        "type": "ken_burns",
-        "zoom_start": 1.0,
-        "zoom_end": 1.15,
-        "pan_direction": "center_to_top"
-      },
-      "transition": { "type": "fade", "duration": 0.3 }
-    }
-  ]
-}
+```
+Topic + Audience
+       │
+       ▼
+BaseSearchAdapter (backend/app/research/search_adapters.py)
+  ├── DDGSSearchAdapter (DuckDuckGo via ddgs; zero API keys, rate-limited)
+  └── MockSearchAdapter (Deterministic fixtures for offline testing)
+       │ Candidate URLs
+       ▼
+BaseExtractionAdapter (backend/app/research/extraction_adapters.py)
+  ├── HTTPTextExtractionAdapter (httpx + lxml; <25 MB RAM, 0 VRAM, clean markdown/text)
+  └── MockExtractionAdapter (Simulated document text & titles)
+       │ Full Extracted Text
+       ▼
+FactLedgerManager (backend/app/research/fact_ledger.py)
+  ├── Exact quote provenance verification (prevents hallucinated evidence)
+  ├── Status classification: VERIFIED | UNVERIFIED | INSUFFICIENT_EVIDENCE
+  └── Duplicate claim suppression via word-overlap similarity (>70% overlap)
+       │ Verified Claims + Source IDs
+       ▼
+Narrative Architect (backend/app/research/narrative_architect.py)
+  ├── Archetypes: CURIOSITY_GAP | HISTORICAL_MICRO_EPIC | DISCONFIRMATION_JOURNEY | SCALE_SHOCK
+  └── Scene beat synthesis bound to supporting claim IDs
+       │ Script Proposal
+       ▼
+DeterministicScriptValidator (backend/app/research/validator.py)
+  ├── Flags missing source links and unverified claims
+  ├── Cadence analysis: Target 2.2 – 2.8 words/second (warns if rushed >3.2 WPS or sluggish <1.8 WPS)
+  ├── Hook potency check: Evaluates opening 3 seconds for intrigue / assertion
+  └── Generates ValidationReportModel (is_valid, score, warnings, errors)
+       │
+       ▼
+Human Review in Next.js Dashboard (FactLedger panel, claim chips, proposal overrides)
 ```
 
-### Deterministic Render Checksum
-`render_checksum = SHA-256(canonical_json(recipe) + narration_bytes_hash + still_assets_hashes + subtitle_bytes_hash)`
-
-### Rule-Based Technical QA
-Prior to presenting a render for human approval, the worker executes automated ffprobe checks:
-1. **Dimensions:** Exactly 1080×1920 (9:16 aspect ratio).
-2. **Duration:** Between 15.0 and 59.5 seconds (Shorts/Reels strict limit).
-3. **Audio Normalization:** Integrated loudness strictly compliant with EBU R128 (-14 to -16 LUFS).
-4. **Visual Health:** Black-frame detection (`blackdetect`) and freeze-frame detection (`freezedetect`).
-5. **Caption Legibility:** Verify subtitles do not overlap safety margin zones (top header and bottom UI overlay areas).
+### FactLedger Core Invariants
+1. **Search Snippet Exclusion:** Search engine summary snippets are strictly forbidden from serving as independently verified evidence. A claim can only be assigned `VERIFIED` status after full document body extraction and verbatim quote verification.
+2. **Explicit Uncertainty:** Unverified claims, extraction timeouts, or 404 responses are recorded explicitly as `UNVERIFIED` or `INSUFFICIENT_EVIDENCE` with detailed uncertainty rationale.
+3. **Database Relational Binding:** Fact sources (`fact_sources`) and claims (`fact_claims`) are content-addressed and relationally linked to projects, proposals, and scene beats (`supporting_claim_ids`).
+4. **Deterministic Gatekeeper:** The `DeterministicScriptValidator` acts as an automated editorial gatekeeper before human approval, blocking hallucinated claim IDs and highlighting pacing bottlenecks.
 
 ---
 
-## 6. Provider Registry & Quota Ledger
+## 6. Dynamic Visual Assembly, Motion, Audio Hierarchy & Multi-Tier QA (Stage 3)
 
-Every service integration adheres to a strict cost contract:
-
-```yaml
-providers:
-  llm_planner:
-    type: "gemini_free"
-    cost_class: "free_quota"   # AI Studio free tier text models only
-    daily_request_limit: 1500
-    rpm_limit: 15
-  
-  tts_narrator:
-    type: "kokoro_onnx"
-    cost_class: "free_local"   # Runs locally on CPU
-    supported_languages: ["en", "hi"]
-
-  tts_manual_ingest:
-    type: "manual_audio"
-    cost_class: "manual"       # Ingests user-provided audio for Kannada, Tamil, etc.
-
-  visual_stills:
-    type: "mock_image"         # Phase 1-2 baseline, replaced in Phase 3
-    cost_class: "free_local"
-
-  video_clips:
-    type: "manual_inbox"
-    cost_class: "manual"       # User drops Flow clips in data/inbox/
-    credit_estimate_per_clip: 10 # Tracks estimated Google Flow credits
-
-  youtube_publisher:
-    type: "youtube_data_api_v3"
-    cost_class: "free_quota"
-    quota_cost_per_upload: 1600
-    daily_quota_limit: 10000
+```
+Scene Beats + Fact Claims
+         │
+         ▼
+CompositeVisualResolver (backend/app/media/visual_adapters.py)
+  ├── Priority 1: UserProvidedAssetAdapter (Uploaded & validated)
+  ├── Priority 2: WikimediaNasaAssetAdapter (API verified: CC-BY, CC0, NASA Open Media)
+  ├── Priority 3: ProceduralGraphicAdapter (Thematic scientific vector infographics)
+  └── Priority 4: Default Solid Gradient (Deterministic fallback)
+         │ Persisted to asset_provenance table
+         ▼
+FFmpeg Composer with Ken Burns Engine (backend/app/media/ffmpeg_composer.py)
+  ├── Bounded Zoom & Pan (zoom_in, zoom_out, pan_left, pan_right, tilt_up, tilt_down)
+  ├── Resolution: 1080x1920 (Benchmark) & 720x1280 (Fast Draft) @ 30 fps
+  └── Subtitle Burn-in (backend/app/media/subtitles.py)
+        • Phrase-level rhythmic chunking (2-4 words)
+        • Mobile safe-zone margins (bottom margin >= 240px for 1080p)
+        • High-contrast bold styling with black outline and active word highlight
+         │
+         ▼
+Audio Mixer & Sidechain Ducking (backend/app/media/audio_mixer.py)
+  ├── Input 0: Speech Narration (Kokoro-82M ONNX or Manual Voiceover)
+  ├── Input 1: Background Music (User track or procedural ambient bed)
+  ├── Sidechain Compression: Duck music by ~14 to 18 dB when speech occurs
+  └── EBU R128 Loudness Normalization: target -16.0 LUFS, true peak <= -1.5 dBTP
+         │
+         ▼
+Dual-Tier Quality Assurance
+  ├── Technical QA (backend/app/media/qa.py):
+  │     • 9:16 aspect ratio & dimensions (1080x1920)
+  │     • Black-frame detection (blackdetect d=1.5s)
+  │     • Freeze-frame detection (freezedetect d=3.0s)
+  │     • True-peak clipping (< -0.5 dBFS) & LUFS compliance
+  └── Editorial QA (backend/app/media/editorial_qa.py):
+        • Opening hook potency & word count in critical first 3 seconds
+        • Pacing & spoken cadence per scene (target 2.2 - 2.8 WPS)
+        • Visual asset diversity & claim alignment
+        • Closing philosophical / takeaway payoff
 ```
 
-### Guardrail on Startup
-If any provider configuration specifies `cost_class: metered` without explicit command-line override and financial cap, the application will **refuse to boot**.
+### Stage 3 Invariants & Operational Rules
+1. **Asset Attribution & Rights Persistence:** Every external visual or audio asset must record source URL, creator/author, verified license name, and attribution string in `asset_provenance`.
+2. **Audio Dominance:** Spoken narration is strictly prioritized; background music is automatically ducked under speech using sidechain compression and normalized to EBU R128 (-16.0 LUFS). Voice-only rendering is fully supported without music.
+3. **Bounded Visual Motion:** Motion filters are strictly bounded (zoom factor 1.0 to 1.12x) to maintain visual clarity and prevent disorientation or pixelation.
+4. **Independent Quality Tiers:** A technical pass from `TechnicalQA` does not certify editorial quality; `EditorialQA` operates as an independent audit scoring retention, pacing, and hook potency.
+
+---
+
+## 7. Hybrid High-Craft Visual Engine (Stage 5)
+
+```
+Scene Beats + Fact Claims
+         │
+         ▼
+SceneVisualSelector (backend/app/media/visual_selector.py)
+  ├── 1. Classify Modality:
+  │     • PROCEDURAL: Formulas, equations, NIST atomic clock lab measurements
+  │     • VIDEO: Curving Earth from orbit, satellites, astronomy, space phenomena
+  │     • IMAGE_KEN_BURNS: Conceptual scenes best depicted by curated stills
+  │
+  ├── 2. Video Ingest Layer (backend/app/media/video_adapters.py):
+  │     • NASAVideoAdapter: NASA Image & Video Library (images-api.nasa.gov)
+  │     • WikimediaVideoAdapter: Wikimedia Commons API (commons.wikimedia.org)
+  │     • Guardrails: Max 35 MB, 10s timeout, video/mp4/webm MIME check, SHA-256 hash
+  │     • Rights Verification: Public Domain, CC0, CC-BY, CC-BY-SA only; rejects NC/ND
+  │
+  ├── 3. Video Reframer (backend/app/media/reframing.py):
+  │     • Standardizes landscape/arbitrary footage to 1080x1920 30fps vertical MP4
+  │     • Strips original audio (-an)
+  │     • Configurable crop anchors: center, top, bottom
+  │
+  └── 4. Fail-Closed Fallback Cascade:
+        • Authentic Video failure -> Procedural Infographic -> Curated Image -> Gradient
+         │
+         ▼
+FFmpeg Composer with Duration-Preserving Transitions (backend/app/media/ffmpeg_composer.py)
+  ├── Clip Handle Extensions: Scenes 0..N-2 extended by transition duration T (default 0.5s)
+  ├── Overlap Offset Arithmetic: Offset_k = Sum_{j=0}^{k} D_j
+  │     Result: Total composite duration exactly equals Sum D_j (0s shrinkage, 0s drift)
+  ├── Short-Scene Fallback: If any D_i < 2*T, falls back to clean jump cut (concat)
+  └── Subtitle Burn-in & AAC Audio remux with -movflags +faststart
+```
+
+### Stage 5 Invariants & Operational Rules
+1. **Zero Runtime Diffusion:** No generative diffusion models or GPU ML frameworks are invoked during rendering. All dynamic motion is sourced via authenticated open APIs or programmatic vector graphics.
+2. **Handle-Extended Cross-Dissolves:** When cross-dissolve transitions (`xfade`) are enabled, earlier scene segments are extracted/generated with length $D_i + T$. The overlap occurs across the extended handle, completely eliminating speech cutoff and caption drift.
+3. **Strict License & Attribution Enforcement:** Downloaded video assets must be verified as open (Public Domain, CC0, CC-BY, CC-BY-SA). Assets with non-commercial, no-derivatives, or third-party copyright claims in metadata are immediately rejected.
+4. **Deterministic Reframing:** Video reframing is executed via pure FFmpeg scaling and cropping to exact 1080x1920 dimensions without introducing aspect-ratio distortion or audio contamination.
+
+---
+
+## 8. Secure YouTube OAuth and Private Upload Architecture (Stage 6)
+
+```
+Human Approval (approvals table) + Checksum Match
+                   │
+                   ▼
+YouTubeUploader (backend/app/publishing/youtube_uploader.py)
+  ├── 1. Pre-Upload Safety Verification:
+  │     • Render exists and Technical QA == 'PASSED'
+  │     • Re-computes on-disk SHA-256 and verifies exact match with render record
+  │     • Validates active, non-superseded human approval (superseded_at IS NULL)
+  │     • Strict Boundary: privacyStatus == 'private' (public/unlisted rejected)
+  │     • Enforces DB Trigger: enforce_valid_approval_before_publish
+  │
+  ├── 2. Resumable Upload (MediaFileUpload chunksize=1MB):
+  │     • Next chunk loop with exponential backoff for transient 5xx errors
+  │     • Daily quota exceeded (403) and revoked token handling
+  │     • Attributed description generation (FactLedger source credits)
+  │     • Persists publish_attempts record with external_id (YouTube Video ID)
+  │
+  └── 3. Idempotency & Deduplication:
+        • Deterministic key: yt_up_{render_id}_{checksum[:12]}
+        • Returns existing confirmed video ID without duplicate uploads
+                   │
+                   ▼
+YouTubeOAuthManager (backend/app/publishing/youtube_oauth.py)
+  ├── 1. CSRF State Validation:
+  │     • Cryptographically random token (secrets.token_urlsafe(32))
+  │     • Persisted in oauth_states table with 10-minute expiry
+  │     • Enforces single-use consumption
+  │
+  ├── 2. Token Lifecycle & Offline Access:
+  │     • Requests access_type="offline" & prompt="consent" for refresh token
+  │     • Automatic token refresh when creds.expired
+  │     • Required scope: https://www.googleapis.com/auth/youtube.upload
+  │
+  └── 3. Restricted Secret Storage (backend/app/publishing/secrets.py):
+        • data/secrets/youtube_credentials.json (0600 file permissions)
+        • data/secrets/client_secret.json (0600 file permissions)
+        • .gitignore protects all secret files from version control
+        • Strict redaction: tokens & secrets never exposed in logs or APIs
+```
+
+### Stage 6 Invariants & Operational Rules
+1. **Strict Private Publishing Boundary:** In Stage 6, initial uploads MUST be strictly `private`. Any attempt to request `public` or `unlisted` status is blocked before any API call is made. No automatic, scheduled, or unreviewed publishing is permitted.
+2. **Database Trigger Guardrail:** The SQLite database trigger `enforce_valid_approval_before_publish` aborts any INSERT into `publish_attempts` unless an active, non-superseded approval exists matching the exact render checksum.
+3. **On-Disk Checksum Verification:** Before initiating an upload, the uploader re-hashes the video file on disk. If the calculated SHA-256 does not match the immutable render record, the upload is aborted to protect against accidental post-render file modification.
+4. **Zero Secret Leakage:** Client secrets, authorization codes, access tokens, and refresh tokens are strictly excluded from Git, database tables, API responses, and application logs. File permissions are restricted to `0600` (read/write only by file owner).
+

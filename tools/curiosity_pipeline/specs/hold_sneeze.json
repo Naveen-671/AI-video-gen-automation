@@ -1,0 +1,81 @@
+{
+  "title": "Why You Should NEVER Hold in a Sneeze",
+  "slug": "HoldSneeze",
+  "project_dir": "/home/naveenr/flow-mcp-out/HoldSneeze",
+  "total_duration": 56.0,
+  "watermark_badge": "/home/naveenr/flow-mcp-out/HoldSneeze/watermark_badge.png",
+  "voice": "am_adam",
+  "voice_speed": 1.22,
+  "scenes": [
+    {
+      "index": 0,
+      "id": "scene-01",
+      "name": "The Violent Trap",
+      "target_start": 0.4,
+      "narration": "A sneeze expels air from your lungs at nearly one hundred miles per hour. But if you pinch your nose and mouth to stifle it...",
+      "sfx": "pressure_rise",
+      "danger_words": ["STIFLE", "VIOLENT"],
+      "safe_words": []
+    },
+    {
+      "index": 1,
+      "id": "scene-02",
+      "name": "The Rebounding Shockwave",
+      "target_start": 8.4,
+      "narration": "That violent blast has nowhere to go. It turns inward, skyrocketing the pressure inside your head by twenty-four times normal levels.",
+      "sfx": "sub_thud",
+      "danger_words": ["VIOLENT", "PRESSURE", "INWARD"],
+      "safe_words": []
+    },
+    {
+      "index": 2,
+      "id": "scene-03",
+      "name": "The Ruptured Eardrum",
+      "target_start": 16.4,
+      "narration": "The shockwave slams back into your Eustachian tubes, which can literally rupture your eardrums and cause permanent hearing loss.",
+      "sfx": "eardrum_snap",
+      "danger_words": ["RUPTURE", "EARDRUMS", "PERMANENT", "LOSS"],
+      "safe_words": []
+    },
+    {
+      "index": 3,
+      "id": "scene-04",
+      "name": "Throat Muscle Tear",
+      "target_start": 24.4,
+      "narration": "Even worse, the extreme force can tear the delicate muscles in your throat, trapping dangerous air pockets inside your neck and chest.",
+      "sfx": "tissue_tear",
+      "danger_words": ["TEAR", "EXTREME", "TRAPPING", "DANGEROUS"],
+      "safe_words": []
+    },
+    {
+      "index": 4,
+      "id": "scene-05",
+      "name": "Popped Blood Vessels",
+      "target_start": 32.4,
+      "narration": "The sudden pressure spike instantly surges into your eyes, popping microscopic blood vessels and leaving the whites bruised and bloody.",
+      "sfx": "capillary_pop",
+      "danger_words": ["POPPING", "BLOOD", "VESSELS", "BLOODY", "BRUISED"],
+      "safe_words": []
+    },
+    {
+      "index": 5,
+      "id": "scene-06",
+      "name": "The Lethal Aneurysm Risk",
+      "target_start": 40.4,
+      "narration": "In severe cases, this intense pressure spike can even cause a weak brain artery to rupture, triggering a life-threatening aneurysm.",
+      "sfx": "heartbeat_climax",
+      "danger_words": ["RUPTURE", "LIFE-THREATENING", "ANEURYSM", "SEVERE"],
+      "safe_words": []
+    },
+    {
+      "index": 6,
+      "id": "scene-07",
+      "name": "The Safe Resolution",
+      "target_start": 48.4,
+      "narration": "That's why doctors warn to never hold it in. Always sneeze freely into your elbow to let the pressure escape safely.",
+      "sfx": "relief_chime",
+      "danger_words": ["NEVER"],
+      "safe_words": ["FREELY", "ESCAPE", "SAFELY", "SAFE"]
+    }
+  ]
+}

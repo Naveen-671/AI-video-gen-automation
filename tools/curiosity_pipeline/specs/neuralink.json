@@ -1,0 +1,61 @@
+{
+  "title": "What REALLY Happens When Neuralink Connects to Your Brain",
+  "slug": "Neuralink",
+  "project_dir": "/home/naveenr/flow-mcp-out/Neuralink",
+  "total_duration": 40.0,
+  "watermark_badge": "/home/naveenr/flow-mcp-out/Neuralink/watermark_badge.png",
+  "voice": "am_adam",
+  "voice_speed": 1.22,
+  "scenes": [
+    {
+      "index": 0,
+      "id": "scene-01",
+      "name": "Robotic Thread Insertion",
+      "target_start": 0.4,
+      "narration": "You might think a brain chip is plugged directly into your skull like a USB cable. But the real process is vastly more delicate.",
+      "sfx": "needle_buzz",
+      "danger_words": ["PLUGGED", "USB"],
+      "safe_words": []
+    },
+    {
+      "index": 1,
+      "id": "scene-02",
+      "name": "Microscopic Thread Navigation",
+      "target_start": 8.4,
+      "narration": "A robotic needle inserts sixty-four ultra-thin polymer threads into your motor cortex, actively dodging blood vessels to prevent bleeding.",
+      "sfx": "rapid_impact",
+      "danger_words": ["NEEDLE", "BLEEDING"],
+      "safe_words": ["PREVENT", "DODGING"]
+    },
+    {
+      "index": 2,
+      "id": "scene-03",
+      "name": "Action Potential Voltage Reading",
+      "target_start": 16.4,
+      "narration": "Over one thousand microscopic electrodes detect tiny microvolt spikes as your neurons fire, converting raw thought into digital binary code.",
+      "sfx": "alarm_whoosh",
+      "danger_words": ["FIRE", "SPIKES"],
+      "safe_words": ["DETECT", "CONVERTING"]
+    },
+    {
+      "index": 3,
+      "id": "scene-04",
+      "name": "Glial Cellular Encapsulation",
+      "target_start": 24.4,
+      "narration": "Your immune cells swarm the threads and form a thin protective scar, but the flexible polymer moves naturally with your brain's blood pulse.",
+      "sfx": "cell_squish",
+      "danger_words": ["SWARM", "SCAR"],
+      "safe_words": ["PROTECTIVE", "NATURALLY", "FLEXIBLE"]
+    },
+    {
+      "index": 4,
+      "id": "scene-05",
+      "name": "Mind-Controlled Bionic Interface",
+      "target_start": 32.4,
+      "narration": "Onboard AI filters the signals in real time, allowing paralyzed patients to move computer cursors or robotic limbs with pure thought.",
+      "sfx": "relief_chime",
+      "danger_words": [],
+      "safe_words": ["ALLOWING", "PURE", "THOUGHT", "MOVE"]
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "genre_id": "03_dark_history",
+  "genre_name": "Dark Ancient History & Bizarre Archaeology",
+  "channel_brand": "CHRONO MYSTERY 3D",
+  "tagline": "Unlocking the Terrifying Secrets and Booby Traps of the Ancient World",
+  "branding_badge": {
+    "icon": "Weathered gold ancient ankh with hourglass spiral",
+    "theme": "Dark obsidian stone (#120F0D)",
+    "accent_color": "#E6B800",
+    "overlay_position": "860:1680"
+  },
+  "visual_style": {
+    "aesthetic": "Atmospheric 3D architectural cutaways, flickering torchlight shadows, ancient weathered limestone, mechanical stone counterweights, toxic mercury mist, dusty tomb shafts, 9:16 vertical",
+    "camera_rules": "Dramatic descent into underground burial shafts, macro views of hidden tripwires, slow push into ancient artifacts"
+  },
+  "audio_profile": {
+    "voice_model": "Kokoro-ONNX",
+    "voice_speaker": "am_adam",
+    "voice_speed": 1.20,
+    "tone": "Chilling, mysterious, atmospheric historical storyteller",
+    "ambient_bed": "Sub-bass cavern resonance with low harmonic vocal drone",
+    "foley_cues": ["grinding_stone", "tripwire_snap", "dart_release", "echoing_drips", "toxic_hiss", "flame_torch_whoosh"]
+  },
+  "subtitle_profile": {
+    "font": "Liberation Sans Bold",
+    "font_size": 74,
+    "margin_v": 420,
+    "stroke_width": 5.5,
+    "active_word_color": "&H00D7FF&",
+    "danger_word_color": "&H1010FF&",
+    "safe_word_color": "&H00E6B8&"
+  },
+  "lead_video_concept": {
+    "title": "The Deadly Booby Traps Inside Emperor Qin's Tomb",
+    "hook": "Archaeologists have found the Terracotta Army, but they refuse to open Emperor Qin Shi Huang's central burial mound. And it's not because of ancient curses.",
+    "duration": 56.0,
+    "scenes_count": 7,
+    "scenes": [
+      {
+        "id": "scene-01",
+        "name": "The Unopened Mound",
+        "beat": "Colossal forested pyramid mound in China; 3D cutaway descending deep beneath 100 feet of sealed compacted earth."
+      },
+      {
+        "id": "scene-02",
+        "name": "Tripwire Crossbow Batteries",
+        "beat": "Macro 3D view inside the sealed entry corridor: ancient bronze repeating crossbows aimed at chest height, linked to delicate stone pressure plates."
+      },
+      {
+        "id": "scene-03",
+        "name": "Rivers of Liquid Mercury",
+        "beat": "Vast subterranean chamber model: automated mechanical pumps circulating 100 tons of liquid elemental mercury mimicking China's rivers."
+      },
+      {
+        "id": "scene-04",
+        "name": "Lethal Vapor Trap",
+        "beat": "Toxic glowing silver mercury vapor accumulating over 2,200 years in the sealed chamber, dense enough to kill an intruder within breaths."
+      },
+      {
+        "id": "scene-05",
+        "name": "Soil Sample Evidence",
+        "beat": "Modern scientific probe: core soil samples around the mound showing mercury concentrations 100 times higher than natural levels."
+      },
+      {
+        "id": "scene-06",
+        "name": "Structural Collapse Risk",
+        "beat": "3D cross-section showing unstable water-logged earth layers; any uncalculated excavation would cause an immediate catastrophic cave-in."
+      },
+      {
+        "id": "scene-07",
+        "name": "Modern Non-Invasive Scans",
+        "beat": "Muon tomography and cosmic ray detectors scanning through the mound safely from the surface without breaking the seal."
+      }
+    ]
+  }
+}

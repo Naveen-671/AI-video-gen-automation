@@ -1,6 +1,11 @@
 .venv/
 __pycache__/
 *.pyc
+*.pyo
+.directory
+*.log
+
+# Databases & local storage
 data/*.db
 data/*.db-wal
 data/*.db-shm
@@ -8,7 +13,29 @@ data/media/*
 !data/media/.gitkeep
 data/inbox/*
 !data/inbox/.gitkeep
+data/backups/
+data/benchmark_audio/
+data/evaluation/OpenMontage/
+data/evaluation/poc_output/
+data/*.wav
+data/*.aac
+data/*.mp4
+data/*.json
+
+# Node & Next.js
 frontend/node_modules/
 frontend/.next/
 frontend/out/
+
+# Secrets & Credentials
 .env
+.env.*
+models/
+data/secrets/
+client_secret*.json
+*.secret*
+credentials*.json
+*.token
+tokens/
+*.pem
+*.key

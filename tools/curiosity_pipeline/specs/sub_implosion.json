@@ -1,0 +1,61 @@
+{
+  "title": "Why Submarines Implode In Less Than 1 Millisecond",
+  "slug": "SubImplosion",
+  "project_dir": "/home/naveenr/flow-mcp-out/SubImplosion",
+  "total_duration": 40.0,
+  "watermark_badge": "/home/naveenr/flow-mcp-out/SubImplosion/watermark_badge.png",
+  "voice": "am_adam",
+  "voice_speed": 1.22,
+  "scenes": [
+    {
+      "index": 0,
+      "id": "scene-01",
+      "name": "Crushing Hydrostatic Abyss",
+      "target_start": 0.4,
+      "narration": "At twelve thousand feet below the surface, the water pressure on a submarine hull is equal to the weight of the Empire State Building.",
+      "sfx": "pressure_rise",
+      "danger_words": ["PRESSURE", "CRUSHING", "WEIGHT"],
+      "safe_words": []
+    },
+    {
+      "index": 1,
+      "id": "scene-02",
+      "name": "Microscopic Delamination",
+      "target_start": 8.4,
+      "narration": "If repeated deep dives create microscopic cracks between the carbon fiber layers, the hull's structural integrity is compromised.",
+      "sfx": "tissue_tear",
+      "danger_words": ["CRACKS", "COMPROMISED", "FAIL"],
+      "safe_words": []
+    },
+    {
+      "index": 2,
+      "id": "scene-03",
+      "name": "Instantaneous Buckling",
+      "target_start": 16.4,
+      "narration": "When the shell finally buckles, the colossal pressure punches inward at over fifteen hundred miles per hour.",
+      "sfx": "sub_thud",
+      "danger_words": ["BUCKLES", "COLOSSAL", "PUNCHES", "VIOLENT"],
+      "safe_words": []
+    },
+    {
+      "index": 3,
+      "id": "scene-04",
+      "name": "Adiabatic Compression Fire",
+      "target_start": 24.4,
+      "narration": "As the air inside is compressed into a tiny space in milliseconds, it instantly superheats to the temperature of the surface of the sun.",
+      "sfx": "laser_shatter",
+      "danger_words": ["SUPERHEATS", "MILLISECONDS", "COMPRESSED"],
+      "safe_words": []
+    },
+    {
+      "index": 4,
+      "id": "scene-05",
+      "name": "Human Neural Latency",
+      "target_start": 32.4,
+      "narration": "Because human nerves require one hundred milliseconds to register pain, the passengers are vaporized before they can even perceive the sound.",
+      "sfx": "relief_chime",
+      "danger_words": ["VAPORIZED", "PAIN"],
+      "safe_words": ["PERCEIVE", "BEFORE"]
+    }
+  ]
+}

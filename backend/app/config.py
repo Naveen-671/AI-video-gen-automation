@@ -8,7 +8,14 @@ DATA_DIR = BASE_DIR / "data"
 DB_PATH = DATA_DIR / "factory.db"
 MEDIA_DIR = DATA_DIR / "media"
 INBOX_DIR = DATA_DIR / "inbox"
+SECRETS_DIR = DATA_DIR / "secrets"
 FRONTEND_OUT_DIR = BASE_DIR / "frontend" / "out"
+
+# YouTube OAuth & Publishing Secrets
+YOUTUBE_SECRETS_FILE = SECRETS_DIR / "youtube_credentials.json"
+YOUTUBE_CLIENT_SECRET_FILE = SECRETS_DIR / "client_secret.json"
+YOUTUBE_OAUTH_SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+YOUTUBE_REDIRECT_URI = os.getenv("YOUTUBE_REDIRECT_URI", "http://localhost:8000/api/v1/auth/youtube/callback")
 
 # Hardware Resource Limits (from ADR-11)
 MIN_FREE_RAM_GIB = 3.0

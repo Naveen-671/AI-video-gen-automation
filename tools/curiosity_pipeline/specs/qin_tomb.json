@@ -1,0 +1,61 @@
+{
+  "title": "The Deadly Booby Traps Inside Emperor Qin's Tomb",
+  "slug": "QinTomb",
+  "project_dir": "/home/naveenr/flow-mcp-out/QinTomb",
+  "total_duration": 40.0,
+  "watermark_badge": "/home/naveenr/flow-mcp-out/QinTomb/watermark_badge.png",
+  "voice": "am_adam",
+  "voice_speed": 1.20,
+  "scenes": [
+    {
+      "index": 0,
+      "id": "scene-01",
+      "name": "The Unopened Pyramid Mound",
+      "target_start": 0.4,
+      "narration": "Archaeologists excavated the Terracotta Army decades ago, but they still refuse to open Emperor Qin's central burial mound.",
+      "sfx": "pressure_rise",
+      "danger_words": ["REFUSE", "CENTRAL"],
+      "safe_words": []
+    },
+    {
+      "index": 1,
+      "id": "scene-02",
+      "name": "Tripwire Bronze Crossbows",
+      "target_start": 8.4,
+      "narration": "Ancient texts reveal the sealed corridors are rigged with mechanical repeating crossbows designed to shoot anyone who steps on hidden floor plates.",
+      "sfx": "eardrum_snap",
+      "danger_words": ["RIGGED", "SHOOT", "CROSSBOWS", "HIDDEN"],
+      "safe_words": []
+    },
+    {
+      "index": 2,
+      "id": "scene-03",
+      "name": "Rivers of Liquid Mercury",
+      "target_start": 16.4,
+      "narration": "Even more terrifying, automated pumps circulate one hundred tons of pure liquid mercury to mimic the great rivers of China.",
+      "sfx": "cell_squish",
+      "danger_words": ["TERRIFYING", "MERCURY", "POISON"],
+      "safe_words": []
+    },
+    {
+      "index": 3,
+      "id": "scene-04",
+      "name": "Lethal Toxic Vapor Accumulation",
+      "target_start": 24.4,
+      "narration": "Over two thousand years, this has filled the sealed vault with dense toxic vapors capable of causing rapid brain failure within breaths.",
+      "sfx": "tissue_tear",
+      "danger_words": ["TOXIC", "VAPORS", "FAILURE", "LETHAL"],
+      "safe_words": []
+    },
+    {
+      "index": 4,
+      "id": "scene-05",
+      "name": "Cosmic Ray Scanning",
+      "target_start": 32.4,
+      "narration": "To explore the tomb safely without triggering traps or inhaling poison, scientists now use cosmic ray scanners to map the interior from above.",
+      "sfx": "relief_chime",
+      "danger_words": ["TRAPS", "POISON"],
+      "safe_words": ["SAFELY", "SCIENTISTS", "EXPLORE"]
+    }
+  ]
+}

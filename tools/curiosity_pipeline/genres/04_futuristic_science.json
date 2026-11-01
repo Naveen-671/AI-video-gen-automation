@@ -1,0 +1,76 @@
+{
+  "genre_id": "04_futuristic_science",
+  "genre_name": "Futuristic Cybernetics, AI & Strange Physics",
+  "channel_brand": "QUANTUM 3D LAB",
+  "tagline": "Visualizing Extreme Physics, Cybernetics, and Next-Gen AI Mysteries",
+  "branding_badge": {
+    "icon": "Glowing neon purple/cyan quantum orbital qubit with circuit traces",
+    "theme": "Dark deep sapphire glass (#090D1A)",
+    "accent_color": "#8A2BE2",
+    "overlay_position": "860:1680"
+  },
+  "visual_style": {
+    "aesthetic": "Holographic 3D volumetric wireframes, glowing synaptic action potentials, quantum wavefunctions, event horizon curvature, silicon nanometer circuitry, clean cyber-laboratory lighting, 9:16 vertical",
+    "camera_rules": "Microscopic dive through nanometer chip architectures, warping space-time coordinate grids, seamless scale transitions from cosmic to quantum"
+  },
+  "audio_profile": {
+    "voice_model": "Kokoro-ONNX",
+    "voice_speaker": "am_adam",
+    "voice_speed": 1.22,
+    "tone": "Futuristic, mind-bending, precise technological visionary",
+    "ambient_bed": "Sub-bass quantum modulation pad with subtle high-frequency data pulse",
+    "foley_cues": ["data_chirp", "synapse_zap", "gravitational_riser", "electromagnetic_blast", "laser_pulse", "hologram_shimmer"]
+  },
+  "subtitle_profile": {
+    "font": "Liberation Sans Bold",
+    "font_size": 74,
+    "margin_v": 420,
+    "stroke_width": 5.5,
+    "active_word_color": "&H00D7FF&",
+    "danger_word_color": "&H1010FF&",
+    "safe_word_color": "&H00E0FF&"
+  },
+  "lead_video_concept": {
+    "title": "What REALLY Happens When Neuralink Connects to Your Brain",
+    "hook": "You might think a brain chip is plugged directly into your thoughts like a computer USB cable. But at the microscopic level, the real process is vastly more delicate.",
+    "duration": 56.0,
+    "scenes_count": 7,
+    "scenes": [
+      {
+        "id": "scene-01",
+        "name": "The Surgical Robot Precision",
+        "beat": "High-tech robotic needle inserting 64 polymer threads thinner than human hair into the cerebral cortex, actively avoiding microscopic blood vessels."
+      },
+      {
+        "id": "scene-02",
+        "name": "Synaptic Action Potential",
+        "beat": "Microscopic 3D view of cortical neurons: glowing sodium and potassium ions surging across synapses as the user imagines moving their hand."
+      },
+      {
+        "id": "scene-03",
+        "name": "Electrode Signal Detection",
+        "beat": "1,024 platinum electrodes detecting voltage fluctuations of just micro-volts; converting raw biochemical spikes into clean digital binary packets."
+      },
+      {
+        "id": "scene-04",
+        "name": "The Glial Scar Immune Reaction",
+        "beat": "Microglia and astrocytes recognizing the foreign polymer; swarming the threads to encapsulate them in a microscopic protective scar tissue layer."
+      },
+      {
+        "id": "scene-05",
+        "name": "Thread Drift & Flexibility",
+        "beat": "3D brain pulsating with blood pressure; why rigid silicon pins failed and why ultra-flexible threads move with natural brain motion."
+      },
+      {
+        "id": "scene-06",
+        "name": "AI Neural Decoding",
+        "beat": "On-chip neural processor filtering noise in real time; decoding thought patterns into smooth mouse cursor vector trajectories."
+      },
+      {
+        "id": "scene-07",
+        "name": "The Bionic Horizon",
+        "beat": "Person controlling robotic limbs or computer screens solely with intent; the seamless interface of human biology and machine intelligence."
+      }
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "genre_id": "01_health_anatomy",
+  "genre_name": "Health & Human Anatomy",
+  "channel_brand": "ANATOMY 3D LAB",
+  "channel_description": "Hyper-realistic 3D anatomical cross-sections, medical curiosities, and viral physiological mechanisms in the signature Zack D. Films style.",
+  "status": "CONFIRMED_ACTIVE",
+  "branding_badge": {
+    "file": "/home/naveenr/flow-mcp-out/DangerTriangle/watermark_badge.png",
+    "overlay_position": "860:1680",
+    "theme": "Dark slate glass with cyan/magenta glowing DNA double-helix"
+  },
+  "visual_style": {
+    "engine": "Google Flow (Veo 2 / Nano Banana)",
+    "aesthetic": "Hyper-detailed 3D medical animation, octane render, translucent cellular layers, glowing physiological pathways, studio rim lighting, 9:16 vertical",
+    "camera_rules": "Dynamic tracking, push-ins on microscopic trauma, cross-section reveals, clean medical studio backdrops"
+  },
+  "audio_profile": {
+    "voice_model": "Kokoro-ONNX",
+    "voice_speaker": "am_adam",
+    "voice_speed": 1.22,
+    "wpm_target": 160,
+    "tone": "Authoritative, clinical, gripping documentary narrator",
+    "ambient_bed": "Subtle 55 Hz sub-bass hospital tension drone",
+    "foley_cues": ["pressure_rise", "sub_thud", "eardrum_snap", "tissue_tear", "capillary_pop", "cell_squish", "heartbeat_climax", "relief_chime"]
+  },
+  "subtitle_profile": {
+    "font": "Liberation Sans Bold",
+    "font_size": 74,
+    "margin_v": 420,
+    "stroke_width": 5.5,
+    "active_word_color": "&H00D7FF&",
+    "danger_word_color": "&H1010FF&",
+    "safe_word_color": "&H30E040&"
+  },
+  "proven_completed_videos": [
+    {
+      "title": "The Danger Triangle of the Face",
+      "path": "/home/naveenr/flow-mcp-out/DangerTriangle/DangerTriangle_final_short.mp4",
+      "duration": 40.0
+    },
+    {
+      "title": "Why You Should NEVER Hold in a Sneeze",
+      "path": "/home/naveenr/flow-mcp-out/HoldSneeze/HoldSneeze_final_short.mp4",
+      "duration": 56.0
+    },
+    {
+      "title": "What REALLY Happens When You Get a Tattoo",
+      "path": "/home/naveenr/flow-mcp-out/TattooInk/TattooInk_final_short.mp4",
+      "duration": 56.0
+    }
+  ]
+}
